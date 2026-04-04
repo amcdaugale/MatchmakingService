@@ -1,0 +1,31 @@
+## Server
+
+./gradlew clean
+./gradlew build
+docker stop $(docker ps -a -q) && docker rm  $(docker ps -a -q)
+docker build -t my-spring-app .
+docker run --name matchserver -p 8080:8080 my-spring-app:latest
+
+
+## Client
+websocat -t -v ws://127.0.0.1:8080/ws-raw
+
+CONNECT
+accept-version:1.1,1.0
+
+^@
+CONNECTED version:1.1 heart-beat:0,0
+
+SUBSCRIBE
+id:sub-0
+destination:/topic/greetings
+
+^@
+
+SEND
+destination:/app/hello
+content-type:application/json
+
+"World"
+^@
+MESSAGE destination:/topic/greetings content-type:text/plain;charset=UTF-8 subscription:sub-0 message-id:8b7ab642-7d1a-c6de-4d03-3ffe0a08d6ce-0 content-length:13  Hello, World!
