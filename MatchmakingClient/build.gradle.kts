@@ -14,6 +14,9 @@ repositories {
 }
 
 dependencies {
+    compileOnly("org.projectlombok:lombok:1.18.30")
+    annotationProcessor("org.projectlombok:lombok:1.18.36")
+    implementation("com.google.code.gson:gson:2.11.0")
     implementation("org.springframework.boot:spring-boot-starter-websocket")
     implementation("org.springframework:spring-websocket:7.0.6")
     implementation("org.springframework:spring-webmvc:7.0.6")
@@ -22,6 +25,7 @@ dependencies {
     implementation("jakarta.platform:jakarta.jakartaee-api:10.0.0")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+
 }
 
 tasks.jar {

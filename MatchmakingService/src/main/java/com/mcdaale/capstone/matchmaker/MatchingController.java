@@ -1,5 +1,7 @@
 package com.mcdaale.capstone.matchmaker;
 
+import com.mcdaale.capstone.matchmaker.request.MatchRequestJson;
+import com.mcdaale.capstone.matchmaker.request.MatchResponseJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -11,6 +13,7 @@ import java.security.Principal;
 
 @Controller
 public class MatchingController {
+    private static final String TAG = MatchingController.class.getSimpleName();
     private final SimpMessagingTemplate messagingTemplate;
     private final MatchmakingService matchmakingService;
 
@@ -26,33 +29,16 @@ public class MatchingController {
     @SendTo("/topic/greetings") // /topic/greetings
     public String initMatch(String message, Principal principal) throws Exception {
         Thread.sleep(1000); // simulated delay
-        String username = (principal != null) ? principal.getName() : "Anonymous";
+        Log.d(TAG, "From log: %S", message);
+        MatchRequestJson matchRequestJson = MatchRequestJson.fromJsonString(message);
 
-        System.out.printf("Matchmaker application responding to %s!", username);
-        System.out.println("STD: Hello, " + message + "!");
-        Log.d("GreetingController", "From log: %S", message);
+        if (null == matchRequestJson) {
+            return "invalid match request";
+        }
 
-        sendCustomMessage("SEND_MSG:Hello, " + message + "!");
+        matchmakingService.newUser(matchRequestJson.getUserId(),  matchRequestJson.getGameId());
 
-
-        matchmakingService.printMessage("Hello from controller, in matchmaking service.");
-        return "RETURN: Hello, " + message + "!";
-    }
-
-    public void sendUserMessage(int userId, String message) {
-        messagingTemplate.convertAndSend("/topic/u" + userId, "System notification: " + message);
-    }
-
-    public void sendMatchBroadcast(int matchId, String message) {
-        messagingTemplate.convertAndSend("/topic/m" + matchId , "System notification: " + message);
-    }
-
-    public void sendCustomMessage(String payload) {
-        messagingTemplate.convertAndSend("/topic/greetings", "System notification: " + payload);
-    }
-
-    public void sendCustomMessage(String payload, String username) {
-        messagingTemplate.convertAndSendToUser(username, "/queue/private", "Hello " + username);
+        return "Welcome player " + matchRequestJson.getUserId();
     }
 
     @GetMapping("/test")

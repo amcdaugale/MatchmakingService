@@ -9,17 +9,20 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class MatchRequestJson {
-    private static final String TAG = MatchRequestJson.class.getSimpleName();
+public class MatchResponseJson {
+    private static final String TAG = MatchResponseJson.class.getSimpleName();
 
-    @SerializedName("userId")
-    private long userId;
+    @SerializedName("matchId")
+    private long matchId;
     @SerializedName("gameId")
     private long gameId;
+    @SerializedName("startTime")
+    private long startTime;
 
-    public MatchRequestJson(long userId, long gameId) {
-        this.userId = userId;
+    public MatchResponseJson(long matchId, long gameId, long startTime) {
+        this.matchId = matchId;
         this.gameId = gameId;
+        this.startTime = startTime;
     }
 
     public String toJsonString() {
@@ -27,15 +30,15 @@ public class MatchRequestJson {
         return gson.toJson(this);
     }
 
-    public static MatchRequestJson fromJsonString(String jsonString) {
-        MatchRequestJson matchRequestJson = null;
+    public static MatchResponseJson fromJsonString(String jsonString) {
+        MatchResponseJson matchResponseJson = null;
         Gson gson = new Gson();
         try {
-            matchRequestJson = gson.fromJson(jsonString, MatchRequestJson.class);
+            matchResponseJson = gson.fromJson(jsonString, MatchResponseJson.class);
         } catch (JsonSyntaxException e) {
             Log.e(TAG, "Failed to convert json: %s", e.getMessage());
         }
 
-        return matchRequestJson;
+        return matchResponseJson;
     }
 }

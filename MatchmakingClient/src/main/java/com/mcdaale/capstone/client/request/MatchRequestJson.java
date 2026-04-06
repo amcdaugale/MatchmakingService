@@ -1,9 +1,9 @@
-package com.mcdaale.capstone.matchmaker.request;
+package com.mcdaale.capstone.client.request;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
-import com.mcdaale.capstone.matchmaker.Log;
+import com.mcdaale.capstone.client.Log;
 import lombok.Getter;
 import lombok.Setter;
 
