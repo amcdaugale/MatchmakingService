@@ -1,6 +1,8 @@
 package com.mcdaale.capstone.matchmaker;
 
+import com.mcdaale.capstone.matchmaker.entity.MatchEntity;
 import com.mcdaale.capstone.matchmaker.object.Match;
+import com.mcdaale.capstone.matchmaker.object.User;
 import com.mcdaale.capstone.matchmaker.request.MatchResponseJson;
 import com.mcdaale.capstone.matchmaker.request.MatchStatusJson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -17,7 +20,54 @@ public class MatchmakingService {
 
     @Autowired
     private MatchRepository matcheRepo;
-    List<Match> match;
+
+    MatchRepoService matchRepoService = new MatchRepoService() {
+        @Override
+        public Match saveMatch(Match match) {
+            MatchEntity matchEntity = new MatchEntity();
+            ArrayList<Long> userId = new ArrayList<>();
+            for (User user : match.getUsers()) {
+                userId.add(user.getId());
+            }
+            matchEntity.setGameid(match.getGameId());
+            matchEntity.setMatchid(match.getMatchid());
+            matchEntity.setUserId(userId);
+            matchEntity.setTimeStart(match.getTimeStart());
+            matcheRepo.save(matchEntity);
+            return null;
+        }
+
+        @Override
+        public List<Match> getMatchList() {
+            ArrayList<Match> match = new ArrayList<>();
+
+            for (MatchEntity matchEntity : matcheRepo.findAll()) {
+                match.add(matchEntity.generateMatch());
+            }
+
+            return match.stream().toList();
+        }
+
+        @Override
+        public Match updateMatch(Match match) {
+            MatchEntity matchEntity = new MatchEntity();
+            ArrayList<Long> userId = new ArrayList<>();
+            for (User user : match.getUsers()) {
+                userId.add(user.getId());
+            }
+            matchEntity.setGameid(match.getGameId());
+            matchEntity.setMatchid(match.getMatchid());
+            matchEntity.setUserId(userId);
+            matchEntity.setTimeStart(match.getTimeStart());
+            matcheRepo.save(matchEntity);
+            return null;
+        }
+
+        @Override
+        public void deleteMatch(Match match) {
+            matcheRepo.deleteById(match.getMatchid());
+        }
+    };
 
     private static String TAG = MatchmakingService.class.getSimpleName();
 
@@ -37,13 +87,13 @@ public class MatchmakingService {
         Match matchMade = null;
         long matchId = 0;
 
-        for (Match match : matcheRepo.findAll()) {
+        for (Match match : matchRepoService.getMatchList()) {
             if (match.getGameId() == gameId) {
                 match.addUser(userId);
                 matchId = match.getMatchid();
 
                 matchMade = match;
-                matcheRepo.save(match);
+                matchRepoService.saveMatch(match);
                 break;
             }
         }
@@ -53,7 +103,7 @@ public class MatchmakingService {
             //matchMade.setMatchid(1L);
             matchMade.setGameId(gameId);
             matchMade.addUser(userId);
-            matcheRepo.save(matchMade);
+            matchRepoService.saveMatch(matchMade);
 
             matchId = matchMade.getMatchid();
         }
@@ -97,7 +147,7 @@ public class MatchmakingService {
         if (matcheRepo.findAll().isEmpty()) {
             Log.d(TAG, "No matches found");
         } else {
-            for (Match match : matcheRepo.findAll()) {
+            for (Match match : matchRepoService.getMatchList()) {
                 checkMatchForConditions(match);
             }
 

@@ -10,7 +10,8 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-@Data
+@Getter
+@Setter
 @Builder
 public class Match extends Game {
     private static final long MATCHING_DEFAULT_TIMEOUT_MS = TimeUnit.MINUTES.toMillis(5);
@@ -35,8 +36,7 @@ public class Match extends Game {
     }
 
     public void addUser(long userId) {
-        User user = new User();
-        user.setId(userId);
+        User user = new User(userId);
         users.add(user);
     }
 
