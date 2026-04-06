@@ -13,17 +13,30 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * This is the match making service. In charge of matching users with other users who just want to open up a socket
+ * together, potentially to play a game together.
+ */
 @Service
 public class MatchmakingService {
+    /**
+     * Object to send messages to user.
+     */
     private final SimpMessagingTemplate messagingTemplate;
 
+    /**
+     * The repository for persistence.
+     * TODO: finalize db connections.
+     */
     @Autowired
     private MatchRepository matcheRepo;
 
+    /**
+     * Implementation of repo service interface.
+     */
     MatchRepoService matchRepoService = new MatchRepoService() {
         @Override
-        public Match saveMatch(Match match) {
+        public void saveMatch(Match match) {
             MatchEntity matchEntity = new MatchEntity();
             ArrayList<Long> userId = new ArrayList<>();
             for (User user : match.getUsers()) {
@@ -34,7 +47,6 @@ public class MatchmakingService {
             matchEntity.setUserId(userId);
             matchEntity.setTimeStart(match.getTimeStart());
             matcheRepo.save(matchEntity);
-            return null;
         }
 
         @Override
@@ -49,7 +61,7 @@ public class MatchmakingService {
         }
 
         @Override
-        public Match updateMatch(Match match) {
+        public void updateMatch(Match match) {
             MatchEntity matchEntity = new MatchEntity();
             ArrayList<Long> userId = new ArrayList<>();
             for (User user : match.getUsers()) {
@@ -60,7 +72,6 @@ public class MatchmakingService {
             matchEntity.setUserId(userId);
             matchEntity.setTimeStart(match.getTimeStart());
             matcheRepo.save(matchEntity);
-            return null;
         }
 
         @Override
@@ -71,17 +82,21 @@ public class MatchmakingService {
 
     private static String TAG = MatchmakingService.class.getSimpleName();
 
+    /**
+     * Init this service.
+     * @param messagingTemplate Set the messaging template to talk to clients form service.
+     */
     @Autowired
     public MatchmakingService(SimpMessagingTemplate messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
     }
 
-    public String printMessage(String message) {
-        Log.d(TAG, "Your message: %s", message);
-        sendUserMessage(11, String.format("Your message was: %s", message));
-        return message;
-    }
-
+    /**
+     * Match a new user requesting to get matched.
+     * @param userId Userid of the user joining.
+     * @param gameId Id of the game to be matched for.
+     * @return id of the match user was added to.
+     */
     public long newUser(long userId, long gameId) {
 
         Match matchMade = null;
@@ -115,11 +130,18 @@ public class MatchmakingService {
         return matchId;
     }
 
+    /**
+     * Run checks for matching on an interval of 1 seccond. We essentially want to create a heart beat.
+     */
     @Scheduled(fixedRate = 1000)
     private void runTaskWithDelay() {
         checkMatchesForConditions();
     }
 
+    /**
+     * Check if match conditions have been met.
+     * @param match Match to check if the criteria was met.
+     */
     private void checkMatchForConditions(Match match) {
         MatchStatusJson.MatchStatus matchStatus = match.getMatchStatus();
         String matchStatusString;
@@ -143,6 +165,9 @@ public class MatchmakingService {
         sendMatchBroadcast(match.getMatchid(), matchStatusString);
     }
 
+    /**
+     * Check all matches for weather or not a match has been created.
+     */
     public void checkMatchesForConditions() {
         if (matcheRepo.findAll().isEmpty()) {
             Log.d(TAG, "No matches found");
@@ -154,10 +179,20 @@ public class MatchmakingService {
         }
     }
 
+    /**
+     * Send the user a message.
+     * @param userId User to message.
+     * @param message String to send.
+     */
     public void sendUserMessage(long userId, String message) {
         messagingTemplate.convertAndSend("/topic/u" + userId,  message);
     }
 
+    /**
+     * Match to send message to.
+     * @param matchId id of matching to message.
+     * @param message String to send.
+     */
     public void sendMatchBroadcast(long matchId, String message) {
         messagingTemplate.convertAndSend("/topic/m" + matchId, message);
     }

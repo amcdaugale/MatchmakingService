@@ -21,21 +21,54 @@ public class MatchStatusJson {
         MATCH_FAILED
     }
 
+    /**
+     * The id of the matching.
+     */
     @SerializedName("matchId")
     private long matchId;
+    /**
+     * The count of players in match.
+     */
     @SerializedName("playerCount")
     private int playerCount;
+
+    /**
+     * The min players to make match.
+     */
     @SerializedName("minPlayerCount")
     private int minPlayerCount;
+
+    /**
+     * The maximum number of players allowed in the match.
+     */
     @SerializedName("maxPlayerCount")
     private int maxPlayerCount;
+    /**
+     * The id of the game object.
+     */
     @SerializedName("gameId")
     private long gameId;
+    /**
+     * The time the match was initiated.
+     */
     @SerializedName("startTime")
     private long startTime;
+    /**
+     * Current status of the match.
+     */
     @SerializedName("matchStatus")
     private int matchStatus;
 
+    /**
+     * A constuctor to set all values.
+     * @param matchId The id of the matching.
+     * @param playerCount The min players to make match.
+     * @param minPlayerCount The min players to make match.
+     * @param maxPlayerCount The maximum number of players allowed in the match.
+     * @param gameId The id of the game object.
+     * @param startTime The time the match was initiated.
+     * @param matchStatus Current status of the match.
+     */
     public MatchStatusJson(long matchId, int playerCount, int minPlayerCount, int maxPlayerCount, long gameId, long startTime, int matchStatus) {
         this.matchId = matchId;
         this.playerCount = playerCount;
