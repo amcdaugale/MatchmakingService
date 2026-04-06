@@ -20,16 +20,34 @@ public class MatchResponseJson {
     private long startTime;
 
     public MatchResponseJson(long matchId, long gameId, long startTime) {
+        /**
+         * Id of match user was joined to.
+         */
         this.matchId = matchId;
+        /**
+         * Id of the game getting matched for..
+         */
         this.gameId = gameId;
+        /**
+         * Time the match was created.
+         */
         this.startTime = startTime;
     }
 
+    /**
+     * Convert this object to a json string.
+     * @return A string representing a serialised version of this object.
+     */
     public String toJsonString() {
         Gson gson = new Gson();
         return gson.toJson(this);
     }
 
+    /**
+     * Convert a json sting to this object.
+     * @param jsonString String json version of this class.
+     * @return this object, else null.
+     */
     public static MatchResponseJson fromJsonString(String jsonString) {
         MatchResponseJson matchResponseJson = null;
         Gson gson = new Gson();

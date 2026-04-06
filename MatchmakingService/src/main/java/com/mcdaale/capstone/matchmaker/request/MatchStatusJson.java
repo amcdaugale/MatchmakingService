@@ -12,6 +12,9 @@ import lombok.Setter;
 public class MatchStatusJson {
     private static final String TAG = MatchStatusJson.class.getSimpleName();
 
+    /**
+     * Status of the matching.
+     */
     public enum MatchStatus {
         MATCHING,
         MATCHED,
@@ -43,11 +46,20 @@ public class MatchStatusJson {
         this.matchStatus = matchStatus;
     }
 
+    /**
+     * Convert this object to a json string.
+     * @return A string representing a serialised version of this object.
+     */
     public String toJsonString() {
         Gson gson = new Gson();
         return gson.toJson(this);
     }
 
+    /**
+     * Convert a json sting to this object.
+     * @param jsonString String json version of this class.
+     * @return this object, else null.
+     */
     public static MatchStatusJson fromJsonString(String jsonString) {
         MatchStatusJson matchRequestJson = null;
         Gson gson = new Gson();
