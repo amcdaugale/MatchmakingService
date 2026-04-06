@@ -13,6 +13,10 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    /**
+     * Cofigure the broker.
+     * @param config configuration to add brokers.
+     */
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         System.out.println("Matchmaker application broker configured!");
@@ -20,6 +24,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         config.setApplicationDestinationPrefixes("/app");
     }
 
+    /**
+     * Register socket endpoints for clients to open up a socket too.
+     * @param registry registry to add any new endpoints..
+     */
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         System.out.println("Matchmaker registering endpoints!");
